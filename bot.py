@@ -19,7 +19,7 @@ CONFIG = {
     "sleep_time": 70,
     "refresh_map_time": 20,
     # minutes
-    "refresh_map": 2,
+    "refresh_map": 4,
     "profiles": [
         {
             "name": "bomb1",
@@ -46,7 +46,7 @@ CONFIG = {
 def print_time(text=None, minutes=None):
     now = datetime.datetime.now()
     if minutes:
-        now = now + datetime.timedelta(minutes=minutes)
+        now = now + datetime.timedelta(hours=-3,minutes=minutes)
     print(f"{text} {now.strftime('%H:%M:%S')}")
 
 
@@ -61,6 +61,21 @@ def push_button(message: str = None, coord: tuple = None, sleep: int = None, ret
         pyautogui.mouseDown(*coord)
         pyautogui.mouseUp(*coord)
 
+    if sleep:
+        time.sleep(sleep)
+
+def hold_key(message: str = None, key: str = None):
+    print_time(text=f"{message}")
+    pyautogui.keyDown('ctrl')
+
+def press_key(message: str = None, key: str = None):
+    print_time(text=f"{message}")
+    pyautogui.keyDown(key)
+    pyautogui.keyUp(key)
+
+def release_key(message: str = None, key: str = None, sleep: int = None):
+    print_time(text=f"{message}")
+    pyautogui.keyDown(key)
     if sleep:
         time.sleep(sleep)
 
@@ -106,12 +121,29 @@ def run():
         start_date = datetime.datetime.now()
         interaction = 0
         for profile in CONFIG['profiles']:
-            print_time(text=f"Start JOB {profile['name']}")
+            print_time(text=f"Start JOB [interaction: {interaction}] {profile['name']}")
 
             push_button(
                 message=f"Refresh PAGE {profile['name']}",
                 coord=profile["refresh"],
-                sleep=12
+                sleep=12,
+                retry=False
+            )
+
+            hold_key(
+                message=f"Refresh page and clear cache hold ctrl {profile['name']}",
+                key='ctrl' 
+            )
+
+            press_key(
+                message=f"Refresh page and clear cache press f5 {profile['name']}",
+                key='f5' 
+            )
+
+            release_key(
+                message=f"Refresh page and clear cache releas ctrl {profile['name']}",
+                key='ctrl',
+                sleep=20
             )
 
             push_button(
